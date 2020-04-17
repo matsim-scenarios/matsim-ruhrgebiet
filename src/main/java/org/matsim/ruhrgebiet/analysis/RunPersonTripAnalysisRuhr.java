@@ -19,6 +19,8 @@
 
 package org.matsim.ruhrgebiet.analysis;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.AgentAnalysisFilter;
 import org.matsim.analysis.AgentFilter;
@@ -44,43 +46,38 @@ public class RunPersonTripAnalysisRuhr {
 		String runId;
 		String runDirectoryToCompareWith;
 		String runIdToCompareWith;
-		String scenarioCRS;
-		String shapeFileZones;
-		String zonesCRS;
-		String zoneFile;
-		String zoneId;
-		String homeActivityPrefix;
-		int scalingFactor;
 		String analysisOutputDirectory;
 
+		final String scenarioCRS = "EPSG:25832";
+		final String zonesCRS = "EPSG:25832";
+		final String zoneId = "plz";
+		final String shapeFileZones = "C:/Users/Janekdererste/repos/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/plzBasedPopulation/plz-gebiete_Ruhrgebiet/plz-gebiete_Ruhrgebiet.shp";
+		final String zoneFile = "C:/Users/Janekdererste/repos/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
+		final String homeActivityPrefix = "home";
+		final int scalingFactor = 100;
+
 		if (args.length > 0) {
-			throw new RuntimeException();
+			var parsedArgs = new Args();
+			JCommander.newBuilder().addObject(parsedArgs).build().parse(args);
+
+			runDirectory = parsedArgs.runDir;
+			runId = parsedArgs.runId;
+			runDirectoryToCompareWith = parsedArgs.runDirToCompare;
+			runIdToCompareWith = parsedArgs.runIdToCompare;
+			analysisOutputDirectory = parsedArgs.outputDir;
 
 		} else {
 
-			runDirectory = "C:\\Users\\Janekdererste\\Desktop\\deurb-no-drt/";
-			runId = "deurbanisation-no-drt";
-
+			runDirectory = "C:\\Users\\Janekdererste\\Desktop\\smartCity-low-fare\\";
+			runId = "smartCity-low-fare-speed";
 			runDirectoryToCompareWith = "C:\\Users\\Janekdererste\\repos\\runs-svn\\nemo\\baseCaseCalibration2\\baseCase_021/output/";
 			runIdToCompareWith = "baseCase_021";
-
-			scenarioCRS = "EPSG:25832";
-
-			shapeFileZones = "C:/Users/Janekdererste/repos/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/plzBasedPopulation/plz-gebiete_Ruhrgebiet/plz-gebiete_Ruhrgebiet.shp";
-			zonesCRS = "EPSG:25832";
-			zoneId = "plz";
-
-			zoneFile = "C:/Users/Janekdererste/repos/shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Ruhrgebiet/ruhrgebiet_boundary.shp";
-
-			homeActivityPrefix = "home";
-			scalingFactor = 100;
-
 			analysisOutputDirectory = "C:/Users/Janekdererste/Desktop/nemo-analysis-ihab/smart-low-fare/";
 		}
-		
+
 		Scenario scenario1 = loadScenario(runDirectory, runId);
 		Scenario scenario0 = loadScenario(runDirectoryToCompareWith, runIdToCompareWith);
-		
+
 		List<AgentFilter> agentFilters = new ArrayList<>();
 
 		AgentAnalysisFilter filter1 = new AgentAnalysisFilter("all-agents");
@@ -148,14 +145,32 @@ public class RunPersonTripAnalysisRuhr {
 
 		analysis.run();
 	}
-	
+
+	private static class Args {
+
+		@Parameter(names = {"-runDir", "-d"}, required = true)
+		String runDir = "";
+
+		@Parameter(names = {"-runId", "-rId"}, required = true)
+		String runId = "";
+
+		@Parameter(names = {"-runDirToCompare", "-dc"}, required = true)
+		String runDirToCompare = "";
+
+		@Parameter(names = {"-runIdToCompare", "-rIdc"}, required = true)
+		String runIdToCompare = "";
+
+		@Parameter(names = {"-outDir"}, required = true)
+		String outputDir = "";
+	}
+
 	private static Scenario loadScenario(String runDirectory, String runId) {
 		log.info("Loading scenario...");
-		
+
 		if (runDirectory == null || runDirectory.equals("") || runDirectory.equals("null")) {
-			return null;	
+			return null;
 		}
-		
+
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 
 		String configFile = runDirectory + runId + ".output_config.xml";

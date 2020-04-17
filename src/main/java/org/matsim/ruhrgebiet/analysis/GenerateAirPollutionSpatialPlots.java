@@ -22,6 +22,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -62,6 +63,9 @@ public class GenerateAirPollutionSpatialPlots {
 	@Parameter(names = {"-runId"}, required = true)
 	private String runId = "";
 
+	@Parameter(names = {"-outDir"})
+	private String outDir = "";
+
 	private GenerateAirPollutionSpatialPlots() {
 
 	}
@@ -79,7 +83,8 @@ public class GenerateAirPollutionSpatialPlots {
 
 		final String configFile = runDir + runId + ".output_config.xml";
 		final String events = runDir + runId + ".emission.events.offline.xml.gz";
-		final String outputFile = runDir + runId + ".NOx";
+		final String outputDir = StringUtils.isBlank(outDir) ? runDir : outDir;
+		final String outputFile = outputDir + runId + ".emissionsgrid.csv";
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.plans().setInputFile(null);
@@ -99,17 +104,17 @@ public class GenerateAirPollutionSpatialPlots {
 				.withBounds(createBoundingBox())
 				.withSmoothingRadius(smoothingRadius)
 				.withCountScaleFactor(scaleFactor)
-				.withGridType(EmissionGridAnalyzer.GridType.Square)
+				.withGridType(EmissionGridAnalyzer.GridType.Hexagonal)
 				.build();
 
 		TimeBinMap<Grid<Map<Pollutant, Double>>> timeBins = analyzer.process(events);
 		//analyzer.processToJsonFile(events, outputFile + ".json");
 
 		log.info("Writing to csv...");
-		writeGridToCSV(timeBins, Pollutant.NOx, outputFile + ".csv");
+		writeGridToCSV(timeBins, outputFile);
 	}
 
-	private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, Pollutant pollutant, String outputPath) {
+	private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, String outputPath) {
 
 		var pollutants = Pollutant.values();
 
