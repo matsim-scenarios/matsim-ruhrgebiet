@@ -21,6 +21,7 @@ package org.matsim.ruhrgebiet.run;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +37,8 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ruhrgebiet.Utils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,13 +50,13 @@ public class RunRuhrgebietScenario {
 
 	public static void main(String[] args) {
 
-		Config config = prepareConfig(args);
-		Scenario scenario = prepareScenario(config);
+		Config config = loadConfig(args);
+		Scenario scenario = loadScenario(config);
 		Controler controler = prepareControler(scenario);
 		controler.run();
 	}
 
-	public static Config prepareConfig(String[] args, ConfigGroup... modules) {
+	public static Config loadConfig(String[] args, ConfigGroup... modules) {
 
 		OutputDirectoryLogging.catchLogEntries();
 
@@ -67,7 +70,6 @@ public class RunRuhrgebietScenario {
 		Config config = ConfigUtils.loadConfig(args, moduleList.toArray(ConfigGroup[]::new));
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-
 		config.qsim().setUsingTravelTimeCheckInTeleportation(true);
 		config.qsim().setUsePersonIdForMissingVehicleId(false);
 		config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);
@@ -87,7 +89,7 @@ public class RunRuhrgebietScenario {
 		return config;
 	}
 
-	public static Scenario prepareScenario(Config config) {
+	public static Scenario loadScenario(Config config) {
 
 		var scenario = ScenarioUtils.loadScenario(config);
 
@@ -111,6 +113,14 @@ public class RunRuhrgebietScenario {
 					activity.setLinkId(link.getId());
 				});
 
+		// add mode vehicles from here, since I messed this up a thousand times already
+		var factory = scenario.getVehicles().getFactory();
+	/*	scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.car, 7.5, 36.111111, 1.0, factory));
+		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.ride, 7.5, 36.111111, 0.1, factory));
+
+		// use twice the speed of 3.42, so that max speed ~25km/h on bike links and ~12km/h on regular streets with speed-factor of 0.5
+		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.bike, 2.0, 6.84, 0.1, factory));
+*/
 		return scenario;
 	}
 
@@ -134,5 +144,15 @@ public class RunRuhrgebietScenario {
 
 		Bicycles.addAsOverridingModule(controler);
 		return controler;
+	}
+
+	private static VehicleType createVehicleType(String id, double length, double maxV, double pce, VehiclesFactory factory) {
+		var vehicleType = factory.createVehicleType(Id.create(id, VehicleType.class));
+		vehicleType.setNetworkMode(id);
+		vehicleType.setPcuEquivalents(pce);
+		vehicleType.setLength(length);
+		vehicleType.setMaximumVelocity(maxV);
+		vehicleType.setWidth(1.0);
+		return vehicleType;
 	}
 }

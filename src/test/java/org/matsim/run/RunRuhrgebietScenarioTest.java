@@ -57,7 +57,7 @@ public class RunRuhrgebietScenarioTest {
 
 		String configFileName = "scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml";
 
-		Config config = RunRuhrgebietScenario.prepareConfig(new String[]{configFileName});
+		Config config = RunRuhrgebietScenario.loadConfig(new String[]{configFileName});
 		assertNotNull(config);
 
 	}
@@ -67,7 +67,7 @@ public class RunRuhrgebietScenarioTest {
 
 		String configFileName = "scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml";
 
-		Config config = RunRuhrgebietScenario.prepareConfig(new String[]{configFileName});
+		Config config = RunRuhrgebietScenario.loadConfig(new String[]{configFileName});
 		config.controler().setWriteEventsInterval(1);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -77,27 +77,27 @@ public class RunRuhrgebietScenarioTest {
 		config.qsim().setNumberOfThreads(1);
 		config.global().setNumberOfThreads(1);
 
-		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
-			final double sample = 0.01;
-			downsample( scenario.getPopulation().getPersons(), sample ) ;
-			config.qsim().setFlowCapFactor( config.qsim().getFlowCapFactor()*sample );
-			config.qsim().setStorageCapFactor( config.qsim().getStorageCapFactor()*sample );
+		Scenario scenario = RunRuhrgebietScenario.loadScenario(config);
+		final double sample = 0.01;
+		downsample(scenario.getPopulation().getPersons(), sample);
+		config.qsim().setFlowCapFactor(config.qsim().getFlowCapFactor() * sample);
+		config.qsim().setStorageCapFactor(config.qsim().getStorageCapFactor() * sample);
 
 		org.matsim.core.controler.Controler controler = RunRuhrgebietScenario.prepareControler(scenario);
-			
-			final Id<Person> person1 = Id.createPersonId("1265160001");
-			final Id<Person> person2 = Id.createPersonId("1286397001");
-			final Set<Id<Person>> personList = new HashSet<>();
-			personList.add(person1);
-			personList.add(person2);
-			
-			LegAnalyzer legAnalyzer = new LegAnalyzer(personList);
-			controler.addOverridingModule(new AbstractModule() {
-				
-				@Override
-				public void install() {
-					this.addEventHandlerBinding().toInstance(legAnalyzer);
-				}
+
+		final Id<Person> person1 = Id.createPersonId("1265160001");
+		final Id<Person> person2 = Id.createPersonId("1286397001");
+		final Set<Id<Person>> personList = new HashSet<>();
+		personList.add(person1);
+		personList.add(person2);
+
+		LegAnalyzer legAnalyzer = new LegAnalyzer(personList);
+		controler.addOverridingModule(new AbstractModule() {
+
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(legAnalyzer);
+			}
 			});
 
 		controler.run();
@@ -148,7 +148,7 @@ public class RunRuhrgebietScenarioTest {
 
 		String configFileName = "scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml";
 
-		Config config = RunRuhrgebietScenario.prepareConfig(new String[]{configFileName});
+		Config config = RunRuhrgebietScenario.loadConfig(new String[]{configFileName});
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setLastIteration(20);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -158,24 +158,24 @@ public class RunRuhrgebietScenarioTest {
 		config.qsim().setNumberOfThreads(1);
 		config.global().setNumberOfThreads(1);
 
-		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
-			final double sample = 0.01;
-			downsample( scenario.getPopulation().getPersons(), sample ) ;
-			config.qsim().setFlowCapFactor( config.qsim().getFlowCapFactor()*sample );
+		Scenario scenario = RunRuhrgebietScenario.loadScenario(config);
+		final double sample = 0.01;
+		downsample(scenario.getPopulation().getPersons(), sample);
+		config.qsim().setFlowCapFactor(config.qsim().getFlowCapFactor() * sample);
 		config.qsim().setStorageCapFactor(config.qsim().getStorageCapFactor() * sample);
 
 		RunRuhrgebietScenario.prepareControler(scenario).run();
 
-			// modal split
+		// modal split
 
 		Map<String, Double> modestats = getModestats(utils.getOutputDirectory() + "ruhrgebiet-v1.1-1pct.modestats.txt");
-			Assert.assertEquals(0.09121245828698554,modestats.get("bike"),0.05);
-			Assert.assertEquals(0.3770856507230256,modestats.get("car"),0.05);
-			Assert.assertEquals(0.29699666295884314,modestats.get("pt"),0.05);
-			Assert.assertEquals(0.06229143492769744,modestats.get("walk"),0.05);
-			Assert.assertEquals(0.1724137931034483,modestats.get("ride"),0.05);
+		Assert.assertEquals(0.09121245828698554, modestats.get("bike"), 0.05);
+		Assert.assertEquals(0.3770856507230256, modestats.get("car"), 0.05);
+		Assert.assertEquals(0.29699666295884314, modestats.get("pt"), 0.05);
+		Assert.assertEquals(0.06229143492769744, modestats.get("walk"), 0.05);
+		Assert.assertEquals(0.1724137931034483, modestats.get("ride"), 0.05);
 
-			// scores
+		// scores
 			
 			// TODO: add score test
 //			Assert.assertEquals(xxx, ruhrgebietScenarioRunner.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.average).get(20), EPSILON);
