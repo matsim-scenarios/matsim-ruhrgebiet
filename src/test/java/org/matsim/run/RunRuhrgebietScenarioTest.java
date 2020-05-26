@@ -53,7 +53,7 @@ public class RunRuhrgebietScenarioTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void prepareConfig() {
+	public final void loadConfig() {
 
 		String configFileName = "scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml";
 
@@ -83,7 +83,7 @@ public class RunRuhrgebietScenarioTest {
 		config.qsim().setFlowCapFactor(config.qsim().getFlowCapFactor() * sample);
 		config.qsim().setStorageCapFactor(config.qsim().getStorageCapFactor() * sample);
 
-		org.matsim.core.controler.Controler controler = RunRuhrgebietScenario.prepareControler(scenario);
+		org.matsim.core.controler.Controler controler = RunRuhrgebietScenario.loadControler(scenario);
 
 		final Id<Person> person1 = Id.createPersonId("1265160001");
 		final Id<Person> person2 = Id.createPersonId("1286397001");
@@ -164,7 +164,7 @@ public class RunRuhrgebietScenarioTest {
 		config.qsim().setFlowCapFactor(config.qsim().getFlowCapFactor() * sample);
 		config.qsim().setStorageCapFactor(config.qsim().getStorageCapFactor() * sample);
 
-		RunRuhrgebietScenario.prepareControler(scenario).run();
+		RunRuhrgebietScenario.loadControler(scenario).run();
 
 		// modal split
 

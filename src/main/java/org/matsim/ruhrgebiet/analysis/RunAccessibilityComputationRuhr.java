@@ -180,7 +180,7 @@ public class RunAccessibilityComputationRuhr {
 			scenarioToGenerateFacilities.getConfig().facilities().setFacilitiesSource(FacilitiesSource.onePerActivityLocationInPlansFile);
 			FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenarioToGenerateFacilities);
 			facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(scenario.getNetwork());
-			facilitiesFromPopulation.run(scenario.getPopulation());			
+			facilitiesFromPopulation.run(scenario.getPopulation());
 			for (ActivityFacility facility : scenarioToGenerateFacilities.getActivityFacilities().getFacilities().values()) {
 				scenario.getActivityFacilities().addActivityFacility(facility);
 			}
@@ -197,7 +197,7 @@ public class RunAccessibilityComputationRuhr {
 		// kai, sep'19
 		// The network filtering here was just a quick fix to get things running before the dev mtg. the network filtering is now in the contrib. dz, sept'19
 
-		org.matsim.core.controler.Controler controler = RunRuhrgebietScenario.prepareControler(scenario);
+		org.matsim.core.controler.Controler controler = RunRuhrgebietScenario.loadControler(scenario);
 
 		/*var module = new AccessibilityModuleRuhr();
 		module.setConsideredActivityType(activityConsideredForAccessibilityComputation.toString());
