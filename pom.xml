@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim</groupId>
     <artifactId>matsim-ruhrgebiet</artifactId>
-    <version>1.1.x-SNAPSHOT</version>
+    <version>1.2.x-SNAPSHOT</version>
 
     <name>MATSim Open Ruhrgebiet scenario project</name>
     <description>MATSim Open Ruhrgebiet scenario project</description>
