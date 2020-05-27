@@ -191,7 +191,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -199,7 +199,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputFile>${project.basedir}/target/${project.build.finalName}.jar</outputFile>
+                            <outputFile>${project.basedir}/target/${project.build.finalName}-shaded.jar</outputFile>
                             <transformers>
                                 <!-- This bit sets the main class for the executable jar as you otherwise would with the assembly plugin -->
                                 <transformer
