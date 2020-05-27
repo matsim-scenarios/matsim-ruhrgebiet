@@ -125,6 +125,13 @@
             <version>${matsim.version}</version>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>accidents</artifactId>
+            <version>${matsim.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.github.matsim-org</groupId>

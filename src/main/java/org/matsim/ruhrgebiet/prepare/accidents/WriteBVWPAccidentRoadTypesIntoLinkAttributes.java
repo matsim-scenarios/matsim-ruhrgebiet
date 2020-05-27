@@ -1,7 +1,10 @@
 package org.matsim.ruhrgebiet.prepare.accidents;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,26 +36,52 @@ public class WriteBVWPAccidentRoadTypesIntoLinkAttributes {
  			args = new String[] {"scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml"}  ;
 		}
 		
-//		Config config = RunRuhrgebietScenario.prepareConfig(args);
-//		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
-//		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-with-RSV.network.xml.gz");
-//		config.plans().setInputFile(null);
-//		
-//		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
-	   Network network = NetworkUtils.readNetwork("D:\\SVN-public\\matsim\\scenarios\\countries\\de\\ruhrgebiet\\ruhrgebiet-v1.1-1pct\\input\\ruhrgebiet-v1.1-with-RSV.network.xml.gz");
-		Map<Id<Link>, ? extends Link> links = network.getLinks();
-		Set<Id<Link>> Ids = links.keySet();
-		Set<String> types = new HashSet<String>();
-		for (Id<Link> id: Ids) {
-			if (network.getLinks().get(id).getAttributes().getAsMap().containsKey("type"))
-		 {
-			String type = network.getLinks().get(id).getAttributes().getAttribute("type").toString();
-		if(types.contains(type));
-		else types.add(type);
-		 }
-		}
-		System.out.println(types);
+		Config config = RunRuhrgebietScenario.prepareConfig(args);
+		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
+     	config.plans().setInputFile(null);
+     	config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-with-RSV.network.xml.gz");
+     	
+		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
+		AccidentsNetworkModification accidentsNetworkModification = new AccidentsNetworkModification(scenario);
+		String landOSMInputShapeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/original_data/OSM_RuhrGebiet/gis_osm_landuse_a_free_1.shp";
+		String tunnelLinkCSVInputFile = null;
+		String planfreeLinkCSVInputFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1.PlanfreeLinks.csv";
+		String outputFile = "ruhrgebiet-v1.1.network-with-bvwp-accidents-attributes.xml.gz";
+		NetworkUtils.writeNetwork(accidentsNetworkModification.setLinkAttributsBasedOnOSMFile(
+				landOSMInputShapeFile ,
+				"EPSG:31468",
+				readColumn(0,tunnelLinkCSVInputFile,";"),
+				readColumn(0,planfreeLinkCSVInputFile, ";")
+				),
+				outputFile);
+
 	}
 
+	public static String[] readColumn(int numCol, String csvFile, String separator) throws IOException {
+		
+		StringBuilder sb = new StringBuilder();
+		String line;
 
+		URL url = new URL(csvFile);
+		BufferedReader br = new BufferedReader(
+		        new InputStreamReader(url.openStream()));
+		
+		// read line by line
+        try {
+			while ((line = br.readLine()) != null) 
+			{
+				String value = "ERROR";
+				String list[] = line.split(separator);
+				if(numCol<list.length) {
+					value = list[numCol];
+				}
+				
+			    sb.append(value).append(separator);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        return sb.toString().split(separator);
+	}
 }
