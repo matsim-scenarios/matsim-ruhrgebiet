@@ -8,7 +8,7 @@ env:
   global:
     - MAVEN_OPTS="-Xmx6g"
   matrix:
-    - TEST=RunRuhrgebietScenarioTest#prepareConfig
+    - TEST=RunRuhrgebietScenarioTest#loadConfig
     - TEST=RunRuhrgebietScenarioTest#runScenarioOneIteration
     - TEST=RunRuhrgebietScenarioTest#runScenario20Iterations
 
