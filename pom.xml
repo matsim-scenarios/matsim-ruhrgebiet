@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim</groupId>
     <artifactId>matsim-ruhrgebiet</artifactId>
-    <version>1.1.x-SNAPSHOT</version>
+    <version>1.1.</version>
 
     <name>MATSim Open Ruhrgebiet scenario project</name>
     <description>MATSim Open Ruhrgebiet scenario project</description>
 
     <properties>
         <!--<matsim.version>12.0-2020w02-SNAPSHOT</matsim.version>-->
-        <matsim.version>12.0-SNAPSHOT</matsim.version>
+        <matsim.version>12.0-2020w21-SNAPSHOT</matsim.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
