@@ -27,19 +27,13 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.analysis.spatial.Grid;
-import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
-import org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author amit, ihab
@@ -58,13 +52,13 @@ public class GenerateAirPollutionSpatialPlots {
 	private static final double scaleFactor = 100.;
 
 	@Parameter(names = {"-dir"}, required = true)
-	private String runDir = "";
+	private final String runDir = "";
 
 	@Parameter(names = {"-runId"}, required = true)
-	private String runId = "";
+	private final String runId = "";
 
 	@Parameter(names = {"-outDir"})
-	private String outDir = "";
+	private final String outDir = "";
 
 	private GenerateAirPollutionSpatialPlots() {
 
@@ -81,84 +75,48 @@ public class GenerateAirPollutionSpatialPlots {
 
 	private void writeEmissions() {
 
-		final String configFile = runDir + runId + ".output_config.xml";
 		final String events = runDir + runId + ".emission.events.offline.xml.gz";
+		final String networkFile = runDir + runId + ".output_network.xml.gz";
 		final String outputDir = StringUtils.isBlank(outDir) ? runDir : outDir;
 		final String outputFile = outputDir + runId + ".emissionsgrid.csv";
 
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.plans().setInputFile(null);
-		config.transit().setTransitScheduleFile(null);
-		config.transit().setVehiclesFile(null);
-		config.vehicles().setVehiclesFile(null);
-		config.network().setInputFile(runDir + runId + ".output_network.xml.gz");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		var boundingBox = createBoundingBox();
 
-		double binSize = 200000; // make the bin size bigger than the scenario has seconds
-		Network network = scenario.getNetwork();
+		var filteredNetwork = NetworkUtils.readNetwork(networkFile).getLinks().values().parallelStream()
+				.filter(link -> boundingBox.covers(MGC.coord2Point(link.getFromNode().getCoord())) || boundingBox.covers(MGC.coord2Point(link.getToNode().getCoord())))
+				.collect(NetworkUtils.getCollector());
 
-		EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-				.withGridSize(gridSize)
-				.withTimeBinSize(binSize)
-				.withNetwork(network)
-				.withBounds(createBoundingBox())
-				.withSmoothingRadius(smoothingRadius)
-				.withCountScaleFactor(scaleFactor)
-				.withGridType(EmissionGridAnalyzer.GridType.Hexagonal)
-				.build();
+		var rasterMap = FastEmissionGridAnalyzer.processEventsFile(events, filteredNetwork, gridSize, 20);
 
-		TimeBinMap<Grid<Map<Pollutant, Double>>> timeBins = analyzer.process(events);
-		//analyzer.processToJsonFile(events, outputFile + ".json");
+		//write NOx
+		var noxRaster = rasterMap.get(Pollutant.NOx);
 
-		log.info("Writing to csv...");
-		writeGridToCSV(timeBins, outputFile);
-	}
+		try (CSVPrinter printer = new CSVPrinter(new FileWriter(outputFile), CSVFormat.TDF)) {
 
-	private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, String outputPath) {
+			// print header
+			printer.printRecord("x", "y", "NOx");
 
-		var pollutants = Pollutant.values();
+			// print pollution per cell
+			noxRaster.forEachCoordinate((x, y, value) -> {
 
-		try (CSVPrinter printer = new CSVPrinter(new FileWriter(outputPath), CSVFormat.TDF)) {
+				if (value < 0.1) return; // don't write values smaller than 0.1g/ha
 
-			//print header with all possible pollutants
-			printer.print("timeBinStartTime");
-			printer.print("x");
-			printer.print("y");
-
-			for (var p : pollutants) {
-				printer.print(p.toString());
-			}
-			printer.println();
-
-			//print values if pollutant was not present just print 0 instead
-			for (TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin : bins.getTimeBins()) {
-				final double timeBinStartTime = bin.getStartTime();
-				for (Grid.Cell<Map<Pollutant, Double>> cell : bin.getValue().getCells()) {
-
-					printer.print(timeBinStartTime);
-					printer.print(cell.getCoordinate().x);
-					printer.print(cell.getCoordinate().y);
-
-					for (var p : pollutants) {
-						if (cell.getValue().containsKey(p)) {
-							printer.print(cell.getValue().get(p));
-						} else {
-							printer.print(0);
-						}
-					}
-					printer.println();
+				try {
+					printer.printRecord(x, y, value * 100);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			}
-        } catch (IOException e) {
-            e.printStackTrace();
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-    private Geometry createBoundingBox() {
-        return new GeometryFactory().createPolygon(new Coordinate[]{
-                new Coordinate(xMin, yMin), new Coordinate(xMax, yMin),
-                new Coordinate(xMax, yMax), new Coordinate(xMin, yMax),
-                new Coordinate(xMin, yMin)
-        });
-    }
+	private Geometry createBoundingBox() {
+		return new GeometryFactory().createPolygon(new Coordinate[]{
+				new Coordinate(xMin, yMin), new Coordinate(xMax, yMin),
+				new Coordinate(xMax, yMax), new Coordinate(xMin, yMax),
+				new Coordinate(xMin, yMin)
+		});
+	}
 }
