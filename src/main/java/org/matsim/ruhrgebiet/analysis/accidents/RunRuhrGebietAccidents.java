@@ -27,11 +27,11 @@ public class RunRuhrGebietAccidents {
  			args = new String[] {"scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml"}  ;
 		}
 		
-		Config config = RunRuhrgebietScenario.prepareConfig(args);
+		Config config = RunRuhrgebietScenario.loadConfig(args);
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
      	config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1.network-with-bvwp-accidents-attributes.xml.gz");
      	
-		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
+		Scenario scenario = RunRuhrgebietScenario.loadScenario(config);
 		accidentsSettings.setEnableAccidentsModule(true);
 		accidentsSettings.setScaleFactor(100);
 		

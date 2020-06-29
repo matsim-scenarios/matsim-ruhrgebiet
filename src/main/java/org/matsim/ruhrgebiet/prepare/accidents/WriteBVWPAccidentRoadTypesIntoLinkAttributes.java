@@ -36,12 +36,12 @@ public class WriteBVWPAccidentRoadTypesIntoLinkAttributes {
  			args = new String[] {"scenarios/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.config.xml"}  ;
 		}
 		
-		Config config = RunRuhrgebietScenario.prepareConfig(args);
+		Config config = RunRuhrgebietScenario.loadConfig(args);
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
      	config.plans().setInputFile(null);
      	config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-with-RSV.network.xml.gz");
      	
-		Scenario scenario = RunRuhrgebietScenario.prepareScenario(config);
+		Scenario scenario = RunRuhrgebietScenario.loadScenario(config);
 		AccidentsNetworkModification accidentsNetworkModification = new AccidentsNetworkModification(scenario);
 		String landOSMInputShapeFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/original_data/OSM_RuhrGebiet/gis_osm_landuse_a_free_1.shp";
 		String tunnelLinkCSVInputFile = null;
