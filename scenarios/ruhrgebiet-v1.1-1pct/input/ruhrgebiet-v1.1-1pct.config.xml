@@ -13,62 +13,66 @@
 		<param name="writePlansInterval" value="100"/>
 		<param name="routingAlgorithmType" value="FastAStarLandmarks"/>
 	</module>
-	<module name="global" >
-		<param name="coordinateSystem" value="EPSG:25832" />
-		<param name="insistingOnDeprecatedConfigVersion" value="false" />
-		<param name="numberOfThreads" value="8" />
+	<module name="global">
+		<param name="coordinateSystem" value="EPSG:25832"/>
+		<param name="insistingOnDeprecatedConfigVersion" value="false"/>
+		<param name="numberOfThreads" value="8"/>
 	</module>
-	<module name="network" >
-		<param name="inputNetworkFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-network-without-RSV.xml.gz" />
+	<module name="network">
+		<param name="inputNetworkFile"
+			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-with-RSV.network.xml.gz"/>
 	</module>
-	<module name="plans" >
-		<param name="inputPlansFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.plans.xml.gz" />
-		<param name="removingUnnecessaryPlanAttributes" value="false" />
+	<module name="plans">
+		<param name="inputPlansFile"
+			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-1pct.plans.xml.gz"/>
+		<param name="removingUnnecessaryPlanAttributes" value="false"/>
 	</module>
-	<module name="vehicles" >
+	<module name="vehicles">
 		<param name="vehiclesFile"
-			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1-mode-vehicles.xml.gz"/>
+			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1.mode-vehicles.xml"/>
 	</module>
-	<module name="transit" >
-		<param name="transitScheduleFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.0-1pct/input/ruhrgebiet-v1.0-transit-schedule.xml.gz" />
-		<param name="useTransit" value="true" />
-		<param name="vehiclesFile" value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.0-1pct/input/ruhrgebiet-v1.0-transit-vehicles.xml.gz" />
+	<module name="transit">
+		<param name="transitScheduleFile"
+			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1.transit-schedule.xml.gz"/>
+		<param name="useTransit" value="true"/>
+		<param name="vehiclesFile"
+			   value="https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/ruhrgebiet/ruhrgebiet-v1.1-1pct/input/ruhrgebiet-v1.1.transit-vehicles.xml.gz"/>
 	</module>
-	<module name="planscalcroute" >
-		<param name="networkModes" value="car,ride,bike" />
-		<parameterset type="teleportedModeParameters" >
-			<param name="mode" value="walk" />
-			<param name="beelineDistanceFactor" value="1.1" />
-			<param name="teleportedModeSpeed" value="1.39" />
+	<module name="planscalcroute">
+		<param name="networkModes" value="car,ride,bike"/>
+		<parameterset type="teleportedModeParameters">
+			<param name="mode" value="walk"/>
+			<param name="beelineDistanceFactor" value="1.1"/>
+			<param name="teleportedModeSpeed" value="1.39"/>
 		</parameterset>
-		<parameterset type="teleportedModeParameters" >
-			<param name="beelineDistanceFactor" value="1.1" />
-			<param name="mode" value="non_network_walk" />
-			<param name="teleportedModeSpeed" value="1.39" />
+		<parameterset type="teleportedModeParameters">
+			<param name="beelineDistanceFactor" value="1.1"/>
+			<param name="mode" value="non_network_walk"/>
+			<param name="teleportedModeSpeed" value="1.39"/>
 		</parameterset>
 	</module>
-	<module name="qsim" >
-		<param name="endTime" value="36:00:00" />
-		<param name="flowCapacityFactor" value="0.01" />
-		<param name="linkDynamics" value="PassingQ" />
-		<param name="mainMode" value="car,bike" />
-		<param name="numberOfThreads" value="8" />
-		<param name="startTime" value="00:00:00" />
-		<param name="storageCapacityFactor" value="0.01" />
-		<param name="stuckTime" value="3000.0" />
-		<param name="trafficDynamics" value="kinematicWaves" />
-		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData" />
-		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+	<module name="qsim">
+		<param name="endTime" value="36:00:00"/>
+		<param name="flowCapacityFactor" value="0.01"/>
+		<param name="linkDynamics" value="PassingQ"/>
+		<param name="mainMode" value="car,bike"/>
+		<param name="numberOfThreads" value="8"/>
+		<param name="startTime" value="00:00:00"/>
+		<param name="storageCapacityFactor" value="0.01"/>
+		<param name="stuckTime" value="3000.0"/>
+		<param name="trafficDynamics" value="kinematicWaves"/>
+		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData"/>
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
 	</module>
-	<module name="strategy" >
-		<parameterset type="strategysettings" >
-			<param name="strategyName" value="ChangeExpBeta" />
-			<param name="weight" value="0.85" />
+	<module name="strategy">
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ChangeExpBeta"/>
+			<param name="weight" value="0.85"/>
 		</parameterset>
-		<parameterset type="strategysettings" >
-			<param name="strategyName" value="ReRoute" />
-			<param name="weight" value="0.05" />
-			<param name="disableAfterIteration" value="400" />
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="weight" value="0.05"/>
+			<param name="disableAfterIteration" value="400"/>
 		</parameterset>
 		<parameterset type="strategysettings" >
 			<param name="strategyName" value="SubtourModeChoice" />

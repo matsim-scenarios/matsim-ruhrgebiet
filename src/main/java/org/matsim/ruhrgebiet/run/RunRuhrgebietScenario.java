@@ -24,8 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.Bicycles;
 import org.matsim.core.config.Config;
@@ -34,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ruhrgebiet.Utils;
 import org.matsim.vehicles.VehicleType;
@@ -52,7 +49,7 @@ public class RunRuhrgebietScenario {
 
 		Config config = loadConfig(args);
 		Scenario scenario = loadScenario(config);
-		Controler controler = prepareControler(scenario);
+		Controler controler = loadControler(scenario);
 		controler.run();
 	}
 
@@ -91,40 +88,10 @@ public class RunRuhrgebietScenario {
 
 	public static Scenario loadScenario(Config config) {
 
-		var scenario = ScenarioUtils.loadScenario(config);
-
-		// remove route information from population since the base case was calibrated with different network
-		// TODO: Re-Calibrate baseCase with new network and currnt pt
-		scenario.getPopulation().getPersons().values().parallelStream()
-				.flatMap(person -> person.getPlans().stream())
-				.flatMap(plan -> plan.getPlanElements().stream())
-				.filter(element -> element instanceof Leg)
-				.map(element -> (Leg) element)
-				.forEach(leg -> leg.setRoute(null));
-
-		// map persons onto new link ids
-		scenario.getPopulation().getPersons().values().parallelStream()
-				.flatMap(person -> person.getPlans().stream())
-				.flatMap(plan -> plan.getPlanElements().stream())
-				.filter(element -> element instanceof Activity)
-				.map(element -> (Activity) element)
-				.forEach(activity -> {
-					var link = NetworkUtils.getNearestLink(scenario.getNetwork(), activity.getCoord());
-					activity.setLinkId(link.getId());
-				});
-
-		// add mode vehicles from here, since I messed this up a thousand times already
-		var factory = scenario.getVehicles().getFactory();
-	/*	scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.car, 7.5, 36.111111, 1.0, factory));
-		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.ride, 7.5, 36.111111, 0.1, factory));
-
-		// use twice the speed of 3.42, so that max speed ~25km/h on bike links and ~12km/h on regular streets with speed-factor of 0.5
-		scenario.getVehicles().addVehicleType(createVehicleType(TransportMode.bike, 2.0, 6.84, 0.1, factory));
-*/
-		return scenario;
+		return ScenarioUtils.loadScenario(config);
 	}
 
-	public static Controler prepareControler(Scenario scenario) {
+	public static Controler loadControler(Scenario scenario) {
 
 		Controler controler = new Controler(scenario);
 		if (!controler.getConfig().transit().isUsingTransitInMobsim())
