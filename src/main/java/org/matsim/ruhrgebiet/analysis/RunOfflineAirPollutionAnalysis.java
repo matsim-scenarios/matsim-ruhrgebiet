@@ -62,7 +62,7 @@ public class RunOfflineAirPollutionAnalysis {
 	private String sharedSvn = "";
 
 	@Parameter(names = {"-runId", "-rId"}, required = true)
-	private String runId = "";
+	private final String runId = "";
 
 	@Parameter(names = {"-runDir", "-dir"}, required = true)
 	private String runDirectory = "";
@@ -100,6 +100,7 @@ public class RunOfflineAirPollutionAnalysis {
 		EmissionsConfigGroup eConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
 		eConfig.setAverageColdEmissionFactorsFile(hbefaFileCold);
 		eConfig.setAverageWarmEmissionFactorsFile(hbefaFileWarm);
+		eConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable);
 		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
 		eConfig.setNonScenarioVehicles(NonScenarioVehicles.ignore);
 

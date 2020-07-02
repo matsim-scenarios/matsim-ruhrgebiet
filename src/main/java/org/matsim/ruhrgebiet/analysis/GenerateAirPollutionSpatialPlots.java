@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * @author amit, ihab
@@ -75,10 +76,11 @@ public class GenerateAirPollutionSpatialPlots {
 
 	private void writeEmissions() {
 
-		final String events = runDir + runId + ".emission.events.offline.xml.gz";
-		final String networkFile = runDir + runId + ".output_network.xml.gz";
+		var runDirPath = Paths.get(runDir);
+		final String events = runDirPath.resolve(runId + ".emission.events.offline.xml.gz").toString();
+		final String networkFile = runDirPath.resolve(runId + ".output_network.xml.gz").toString();
 		final String outputDir = StringUtils.isBlank(outDir) ? runDir : outDir;
-		final String outputFile = outputDir + runId + ".emissionsgrid.csv";
+		final String outputFile = Paths.get(outputDir).resolve(runId + ".emissionsgrid.csv").toString();
 
 		var boundingBox = createBoundingBox();
 
@@ -102,7 +104,7 @@ public class GenerateAirPollutionSpatialPlots {
 				if (value < 0.1) return; // don't write values smaller than 0.1g/ha
 
 				try {
-					printer.printRecord(x, y, value * 100);
+					printer.printRecord(x, y, value * 100); // times 100 because of 1pct sample
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
