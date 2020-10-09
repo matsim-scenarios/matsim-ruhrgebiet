@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.ruhrgebiet.analysis;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -30,11 +29,14 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.analysis.FastEmissionGridAnalyzer;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * @author amit, ihab
@@ -53,25 +55,49 @@ public class GenerateAirPollutionSpatialPlots {
 	private static final double scaleFactor = 100.;
 
 	@Parameter(names = {"-dir"}, required = true)
-	private final String runDir = "";
+	private String runDir = "";
 
 	@Parameter(names = {"-runId"}, required = true)
-	private final String runId = "";
+	private String runId = "";
 
 	@Parameter(names = {"-outDir"})
-	private final String outDir = "";
+	private String outDir = "";
 
 	private GenerateAirPollutionSpatialPlots() {
 
 	}
 
-	public static void main(String[] args) {
+	public GenerateAirPollutionSpatialPlots(String runDir, String runId, String outDir) {
+		this.runDir = runDir;
+		this.runId = runId;
+		this.outDir = outDir;
+	}
+
+/*	public static void main(String[] args) {
 
 		GenerateAirPollutionSpatialPlots plots = new GenerateAirPollutionSpatialPlots();
 
 		JCommander.newBuilder().addObject(plots).build().parse(args);
 
 		plots.writeEmissions();
+	}
+
+ */
+
+	public static void main(String[] args) {
+
+		var runs = List.of(
+				Tuple.of("C:\\Users\\Janekdererste\\Desktop\\deurb\\output-base", "baseCase"),
+				Tuple.of("C:\\Users\\Janekdererste\\Desktop\\deurb\\output-50pct", "deurbanisation-50pct-matches"),
+				Tuple.of("C:\\Users\\Janekdererste\\Desktop\\deurb\\output-10pct", "deurbanisation-10pct-matches"),
+				Tuple.of("C:\\Users\\Janekdererste\\Desktop\\deurb\\output-90pct", "deurbanisation-90pct-matches")
+		);
+
+		for (var run : runs) {
+
+			var plot = new GenerateAirPollutionSpatialPlots(run.getFirst(), run.getSecond(), "");
+			plot.writeEmissions();
+		}
 	}
 
 	private void writeEmissions() {
@@ -87,6 +113,13 @@ public class GenerateAirPollutionSpatialPlots {
 		var filteredNetwork = NetworkUtils.readNetwork(networkFile).getLinks().values().parallelStream()
 				.filter(link -> boundingBox.covers(MGC.coord2Point(link.getFromNode().getCoord())) || boundingBox.covers(MGC.coord2Point(link.getToNode().getCoord())))
 				.collect(NetworkUtils.getCollector());
+
+		var transformation = TransformationFactory.getCoordinateTransformation("EPSG:25832", "EPSG:3857");
+		filteredNetwork.getNodes().values().parallelStream().forEach(node -> {
+
+			var transformed = transformation.transform(node.getCoord());
+			node.setCoord(transformed);
+		});
 
 		var rasterMap = FastEmissionGridAnalyzer.processEventsFile(events, filteredNetwork, gridSize, 20);
 

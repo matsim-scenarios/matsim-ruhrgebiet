@@ -66,7 +66,7 @@ public class RunRuhrgebietScenario {
 
 		Config config = ConfigUtils.loadConfig(args, moduleList.toArray(ConfigGroup[]::new));
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		//config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressWalkType.walkToLink);
 		config.qsim().setUsingTravelTimeCheckInTeleportation(true);
 		config.qsim().setUsePersonIdForMissingVehicleId(false);
 		config.subtourModeChoice().setProbaForRandomSingleTripMode(0.5);

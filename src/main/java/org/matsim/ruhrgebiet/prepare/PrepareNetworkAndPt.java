@@ -188,21 +188,21 @@ public class PrepareNetworkAndPt {
 		if (Files.notExists(publicSvn.resolve(bikeHighways)))
 			throw new RuntimeException(publicSvn.resolve(bikeHighways).toString() + " does not exist!");
 		if (Files.notExists(sharedSvn.resolve(longTermCountsRoot)))
-			throw new RuntimeException(publicSvn.resolve(longTermCountsRoot).toString() + " does not exist!");
+			throw new RuntimeException(sharedSvn.resolve(longTermCountsRoot).toString() + " does not exist!");
 		if (Files.notExists(sharedSvn.resolve(longTermCountsIdMapping)))
-			throw new RuntimeException(publicSvn.resolve(longTermCountsIdMapping).toString() + " does not exist!");
+			throw new RuntimeException(sharedSvn.resolve(longTermCountsIdMapping).toString() + " does not exist!");
 		if (Files.notExists(sharedSvn.resolve(shortTermCountsRoot)))
-			throw new RuntimeException(publicSvn.resolve(shortTermCountsRoot).toString() + " does not exist!");
+			throw new RuntimeException(sharedSvn.resolve(shortTermCountsRoot).toString() + " does not exist!");
 		if (Files.notExists(sharedSvn.resolve(shortTermCountsIdMapping)))
-			throw new RuntimeException(publicSvn.resolve(shortTermCountsIdMapping).toString() + " does not exist!");
+			throw new RuntimeException(sharedSvn.resolve(shortTermCountsIdMapping).toString() + " does not exist!");
 	}
 
 	private static class CommandLineArgs {
 
 		@Parameter(names = {"-publicSvn", "-ps"}, required = true)
-		private String publicSvn = "";
+		private final String publicSvn = "";
 
 		@Parameter(names = {"-sharedSvn", "-ss"}, required = true)
-		private String sharedSvn = "";
+		private final String sharedSvn = "";
 	}
 }

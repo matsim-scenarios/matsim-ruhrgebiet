@@ -19,7 +19,6 @@
 
 package org.matsim.ruhrgebiet.analysis;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -43,6 +42,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.List;
+
 /**
  * @author ikaddoura
  */
@@ -62,21 +63,70 @@ public class RunOfflineAirPollutionAnalysis {
 	private String sharedSvn = "";
 
 	@Parameter(names = {"-runId", "-rId"}, required = true)
-	private final String runId = "";
+	private String runId = "";
 
 	@Parameter(names = {"-runDir", "-dir"}, required = true)
 	private String runDirectory = "";
+
+	RunOfflineAirPollutionAnalysis(String baseDirectory, String runId, String sharedSvn) {
+
+		this.runDirectory = baseDirectory;
+		this.runId = runId;
+		this.sharedSvn = sharedSvn;
+
+	}
 
 	/**
 	 * Run this to genereate emission events
 	 *
 	 * @param args Command line args to configure the script. works like: -svn /path/to/your/shared-svn/root/ -rId your-run-id -dir /path/to/results/directory/
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 
 		var analysis = new RunOfflineAirPollutionAnalysis();
 		JCommander.newBuilder().addObject(analysis).build().parse(args);
 		analysis.run();
+	}
+
+	 */
+	public static void main(String[] args) {
+
+		var dirs = List.of(
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-10pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-20pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-30pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-40pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-50pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-60pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-70pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-80pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-90pct",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-base"
+		);
+
+		var runIds = List.of(
+				"deurbanisation-10pct-matches",
+				"deurbanisation-20pct-matches",
+				"deurbanisation-30pct-matches",
+				"deurbanisation-40pct-matches",
+				"deurbanisation-50pct-matches",
+				"deurbanisation-60pct-matches",
+				"deurbanisation-70pct-matches",
+				"deurbanisation-80pct-matches",
+				"deurbanisation-90pct-matches",
+				"baseCase"
+		);
+
+		var sharedSvn = "C:\\Users\\Janekdererste\\repos\\shared-svn";
+
+
+		for (int i = 0; i < dirs.size(); i++) {
+
+			var dir = dirs.get(i);
+			var id = runIds.get(i);
+
+			new RunOfflineAirPollutionAnalysis(dir, id, sharedSvn).run();
+		}
 	}
 
 	private void run() {
@@ -104,8 +154,7 @@ public class RunOfflineAirPollutionAnalysis {
 		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
 		eConfig.setNonScenarioVehicles(NonScenarioVehicles.ignore);
 
-		final String emissionEventOutputFile = runDirectory + runId + ".emission.events.offline.xml.gz";
-		final String eventsFile = runDirectory + runId + ".output_events.xml.gz";
+
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -181,6 +230,9 @@ public class RunOfflineAirPollutionAnalysis {
 				bind(EmissionModule.class);
 			}
 		};
+
+		final String emissionEventOutputFile = runDirectory + runId + ".emission.events.offline.xml.gz";
+		final String eventsFile = runDirectory + runId + ".output_events.xml.gz";
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module);
 

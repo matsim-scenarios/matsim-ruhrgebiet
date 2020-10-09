@@ -1,6 +1,5 @@
 package org.matsim.ruhrgebiet.analysis;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -26,16 +25,39 @@ public class GenerateSingleAirPollutionValue {
 	@Parameter(names = {"-output", "-o"}, required = true)
 	private String outputFile = "";
 
+	public GenerateSingleAirPollutionValue(List<String> inputs, String output) {
+		this.eventsFiles = inputs;
+		this.outputFile = output;
+	}
+
 	/**
 	 * Run the script with command line args
 	 *
 	 * @param args e.g. -e /path/to/your/emission/events-file.xml.gz -e /path/to/your/other/emission/events-file.xml.gz -o /path/to/your/output/file.csv
 	 */
-	public static void main(String[] args) throws IOException {
+/*	public static void main(String[] args) throws IOException {
 
 		var analysis = new GenerateSingleAirPollutionValue();
 		JCommander.newBuilder().addObject(analysis).build().parse(args);
 		analysis.run();
+	}
+*/
+	public static void main(String[] args) throws IOException {
+
+		var eventFiles = List.of(
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-10pct\\deurbanisation-10pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-20pct\\deurbanisation-20pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-30pct\\deurbanisation-30pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-40pct\\deurbanisation-40pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-50pct\\deurbanisation-50pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-60pct\\deurbanisation-60pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-70pct\\deurbanisation-70pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-80pct\\deurbanisation-80pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-90pct\\deurbanisation-90pct-matches.emission.events.offline.xml.gz",
+				"C:\\Users\\Janekdererste\\Desktop\\deurb\\output-base\\baseCase.emission.events.offline.xml.gz"
+		);
+
+		new GenerateSingleAirPollutionValue(eventFiles, "C:\\Users\\Janekdererste\\Desktop\\deurb\\total-emissions.csv").run();
 	}
 
 	public void run() throws IOException {
@@ -46,7 +68,9 @@ public class GenerateSingleAirPollutionValue {
 					var manager = EventsUtils.createEventsManager();
 					manager.addHandler(new Handler(pollution));
 					var reader = new EmissionEventsReader(manager);
+					manager.initProcessing();
 					reader.readFile(file);
+					manager.finishProcessing();
 					return Tuple.of(file, pollution);
 				})
 				.peek(tuple -> {
